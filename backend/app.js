@@ -1,3 +1,4 @@
+// app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
@@ -11,6 +12,7 @@ require('dotenv').config();
 
 // Routes
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const errorHandler = require('./middleware/error');
 
 const app = express();
@@ -38,13 +40,13 @@ app.use(limiter); // Apply rate limiting middleware
 
 // Database connection
 mongoose
-  .connect(process.env.DB) // Removed deprecated options
+  .connect(dbURI) // Use the dbURI from .env file
   .then(() => console.log('Database connected successfully'))
   .catch((err) => console.log('Database connection error:', err));
 
-
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 // Default route
 app.get('/', (req, res) => {
