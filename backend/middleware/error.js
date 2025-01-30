@@ -24,10 +24,13 @@ const errorHandler = (err, req, res, next) => {
         error = new ErrorResponse(message, 400);
     }
 
+    // Log the error for debugging
+    console.error(err);
+
     // Send the response
-    res.status(error.statusCode).json({
+    res.status(error.statusCode || 500).json({
         success: false,
-        error: error.message,
+        error: error.message || 'Server Error',
     });
 };
 

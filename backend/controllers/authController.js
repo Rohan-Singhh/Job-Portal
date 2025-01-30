@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const ErrorResponse = require('../utils/errorResponse');
+const jwt = require('jsonwebtoken');
 
 // User signup
 exports.signup = async (req, res, next) => {
@@ -88,15 +89,39 @@ const sendTokenResponse = (user, statusCode, res) => {
         });
 };
 
-
-// logout
-exports.logout = (req,res,next)=>{
+// Logout
+exports.logout = (req, res, next) => {
     res.clearCookie('token');
     res.status(200).json({
         success: true,
-        message: 'User logged out successfully!'
-    })
-}
+        message: 'User logged out successfully!',
+    });
+};
 
+// User Profile
+exports.userProfile = async (req, res, next) => {
+    // Check if req.user is populated
+    if (!req.user) {
+        return next(new ErrorResponse('User not authenticated', 401));
+    }
 
-// test  file to test
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+
+        if (!user) {
+            return next(new ErrorResponse('User not found', 404));
+        }
+
+        res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {
+        next(error); // Pass any unexpected errors to the error handler
+    }
+};
+
+// Test route (optional for testing purpose)
+exports.testRoute = (req, res) => {
+    res.status(200).json({ message: 'Test route is working!' });
+};
